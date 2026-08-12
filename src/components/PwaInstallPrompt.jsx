@@ -13,7 +13,10 @@ export default function PwaInstallPrompt() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
         .register('/PluvioSC/sw.js')
-        .then(() => console.log('PWA Service Worker registrado!'))
+        .then((reg) => {
+          console.log('PWA Service Worker registrado!');
+          reg.update(); // Força a busca pela versão mais recente do sw.js e dos bundles JS/CSS
+        })
         .catch((err) => console.log('Falha ao registrar Service Worker:', err));
     }
 

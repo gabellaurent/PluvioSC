@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pluviosc-v1';
+const CACHE_NAME = 'pluviosc-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -16,7 +16,12 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            console.log('Deletando cache antigo do PWA:', key);
+            return caches.delete(key);
+          }
+        })
       );
     })
   );
@@ -24,10 +29,28 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Network first strategy for weather API, fallback to cache for static assets
-  if (event.request.url.includes('api.open-meteo.com')) {
-    event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
+  // Network first strategy para HTML, APIs e novos bundles JS/CSS
+  if (
+    event.request.mode === 'navigate' ||
+    event.request.url.includes('api.open-meteo.com') ||
+    event.request.url.includes('flood-api.open-meteo.com') ||
+    event.request.url.includes('.js') ||
+    event.request.url.includes('.css')
+  ) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Guarda cópia atualizada
+          if (response && response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
   } else {
+    // Cache first para imagens e fontes estáticas
     event.respondWith(
       caches.match(event.request).then((response) => response || fetch(event.request))
     );
