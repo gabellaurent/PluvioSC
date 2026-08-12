@@ -1,0 +1,232 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import Header from './components/Header';
+import AccumulatedCards from './components/AccumulatedCards';
+import RiskAlertBanner from './components/RiskAlertBanner';
+import PrecipitationCharts from './components/PrecipitationCharts';
+import DataTable from './components/DataTable';
+import Footer from './components/Footer';
+import { SC_CITIES, DEFAULT_CITY } from './data/scCities';
+import { fetchPluviometryData } from './services/openMeteo';
+import { AlertCircle, CloudRain, Droplets, Loader2, MapPin, RefreshCw, Thermometer, Wind, Eye } from 'lucide-react';
+
+export default function App() {
+  const [selectedCity, setSelectedCity] = useState(DEFAULT_CITY);
+  const [isGpsActive, setIsGpsActive] = useState(false);
+  
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const loadData = useCallback(async (cityObj) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await fetchPluviometryData(cityObj.lat, cityObj.lon);
+      setData(result);
+    } catch (err) {
+      console.error('Erro ao carregar pluviometria:', err);
+      setError(err.message || 'Falha ao buscar dados meteorológicos da Open-Meteo.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData(selectedCity);
+  }, [selectedCity, loadData]);
+
+  const handleSelectCity = (city) => {
+    setIsGpsActive(false);
+    setSelectedCity(city);
+  };
+
+  const handleUseGps = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocalização não é suportada pelo seu navegador.');
+      return;
+    }
+
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const customGpsCity = {
+          id: 'gps-custom',
+          name: 'Sua Localização GPS',
+          region: 'Coordenadas Atuais',
+          lat,
+          lon
+        };
+        setIsGpsActive(true);
+        setSelectedCity(customGpsCity);
+      },
+      (err) => {
+        console.error('Erro de geolocalização:', err);
+        alert('Não foi possível obter sua localização GPS. Verifique as permissões.');
+        setLoading(false);
+      }
+    );
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col selection:bg-cyan-500 selection:text-white">
+      {/* Top Header Bar */}
+      <Header
+        selectedCity={selectedCity}
+        onSelectCity={handleSelectCity}
+        onUseGps={handleUseGps}
+        onRefresh={() => loadData(selectedCity)}
+        loading={loading}
+        isGpsActive={isGpsActive}
+        lastUpdated={data?.lastUpdated}
+      />
+
+      {/* Main Container */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6">
+        
+        {/* Weather Hero Card */}
+        <div className="glass-card-static p-6 lg:p-8 mb-6 relative overflow-hidden bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-cyan-950/40 border border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+          {/* Background Ambient Glow */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
+            
+            {/* Left Location Info */}
+            <div className="flex items-start gap-4">
+              <div className="p-4 rounded-2xl bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.2)] shrink-0">
+                <MapPin className="w-8 h-8 animate-float" />
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h2 className="text-3xl lg:text-4xl font-black text-slate-100 tracking-tight">
+                    {selectedCity.name}
+                  </h2>
+                  {selectedCity.capital && (
+                    <span className="text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+                      Capital SC ⭐
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm font-medium text-slate-400 mt-1 flex flex-wrap items-center gap-2">
+                  <span className="text-cyan-300 font-semibold">{selectedCity.region}</span>
+                  <span>•</span>
+                  <span>Coordenadas: {selectedCity.lat.toFixed(4)}°, {selectedCity.lon.toFixed(4)}°</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Right Live Weather Stats Pill */}
+            {data?.current && (
+              <div className="w-full lg:w-auto bg-slate-950/80 p-4 rounded-2xl border border-white/10 flex flex-wrap items-center justify-between lg:justify-end gap-6 shadow-inner">
+                {/* Temp */}
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                    <Thermometer className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block">Temperatura</span>
+                    <span className="font-black text-slate-100 text-base">{data.current.temp} °C</span>
+                  </div>
+                </div>
+
+                <div className="h-8 w-px bg-slate-800 hidden sm:block"></div>
+
+                {/* Humidity */}
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    <Droplets className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block">Umidade</span>
+                    <span className="font-black text-slate-100 text-base">{data.current.humidity}%</span>
+                  </div>
+                </div>
+
+                <div className="h-8 w-px bg-slate-800 hidden sm:block"></div>
+
+                {/* Wind */}
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                    <Wind className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block">Vento</span>
+                    <span className="font-black text-slate-100 text-base">{data.current.windSpeed} km/h</span>
+                  </div>
+                </div>
+
+                <div className="h-8 w-px bg-slate-800 hidden sm:block"></div>
+
+                {/* Condition */}
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                    <CloudRain className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block">Condição</span>
+                    <span className="font-extrabold text-cyan-300 text-xs">{data.current.weatherText}</span>
+                  </div>
+                </div>
+
+              </div>
+            )}
+
+          </div>
+        </div>
+
+        {/* Loading Spinner */}
+        {loading && !data && (
+          <div className="glass-card p-16 my-8 flex flex-col items-center justify-center text-center">
+            <Loader2 className="w-12 h-12 text-cyan-400 animate-spin mb-4" />
+            <h3 className="text-xl font-black text-slate-200">Buscando dados da Open-Meteo...</h3>
+            <p className="text-xs text-slate-400 mt-1 font-medium">Calculando acumulados diários e estatísticas pluviométricas em {selectedCity.name}</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="glass-card p-8 my-8 border-red-500/40 bg-red-950/20 text-center">
+            <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+            <h3 className="text-lg font-bold text-red-200">Erro ao carregar dados meteorológicos</h3>
+            <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">{error}</p>
+            <button
+              onClick={() => loadData(selectedCity)}
+              className="mt-4 px-4 py-2 rounded-xl text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/40 hover:bg-red-500/30 transition-all"
+            >
+              <RefreshCw className="w-3.5 h-3.5 inline mr-1" />
+              Tentar Novamente
+            </button>
+          </div>
+        )}
+
+        {/* Loaded Dashboard Content */}
+        {data && (
+          <>
+            {/* Defesa Civil SC Risk Banner */}
+            <RiskAlertBanner risk={data.risk} last24hMm={data.totals.last24hMm} />
+
+            {/* Accumulated Rainfall Cards (Hoje, 24h, 7 dias, Mês, Instantânea) */}
+            <AccumulatedCards totals={data.totals} current={data.current} />
+
+            {/* Interactive Charts */}
+            <PrecipitationCharts
+              dailyData={data.dailyChartData}
+              hourlyData={data.hourlyChartData}
+            />
+
+            {/* Detailed Data Table + CSV Download */}
+            <DataTable
+              dailyData={data.dailyChartData}
+              cityName={selectedCity.name}
+            />
+          </>
+        )}
+
+      </main>
+
+      {/* Footer */}
+      <Footer />
+    </div>
+  );
+}
