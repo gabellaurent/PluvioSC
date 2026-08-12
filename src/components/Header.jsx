@@ -1,5 +1,5 @@
 import React from 'react';
-import { CloudRain, MapPin, Navigation, RefreshCw, Sparkles, Activity } from 'lucide-react';
+import { CloudRain, MapPin, Navigation, RefreshCw, Sparkles, Activity, Smartphone } from 'lucide-react';
 import { SC_CITIES } from '../data/scCities';
 
 export default function Header({ 
