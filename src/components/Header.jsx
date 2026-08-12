@@ -93,6 +93,20 @@ export default function Header({
             <span>GPS</span>
           </button>
 
+          {/* Baixar App Button Prominent */}
+          <button
+            onClick={() => {
+              localStorage.removeItem('pluviosc_pwa_dismissed');
+              window.dispatchEvent(new Event('beforeinstallprompt'));
+              window.location.reload();
+            }}
+            title="Instalar aplicativo na tela inicial"
+            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 shadow-[0_0_20px_rgba(245,158,11,0.4)] active:scale-95 transition-all cursor-pointer uppercase tracking-wider"
+          >
+            <Smartphone className="w-4 h-4 text-slate-950" />
+            <span>Baixar App</span>
+          </button>
+
           {/* Refresh Button */}
           <button
             onClick={onRefresh}
