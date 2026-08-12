@@ -5,6 +5,7 @@ import AccumulatedCards from './components/AccumulatedCards';
 import RiskAlertBanner from './components/RiskAlertBanner';
 import ForecastWidget from './components/ForecastWidget';
 import RiverLevelWidget from './components/RiverLevelWidget';
+import LiveCamerasWidget from './components/LiveCamerasWidget';
 import PrecipitationCharts from './components/PrecipitationCharts';
 import DataTable from './components/DataTable';
 import PwaInstallPrompt from './components/PwaInstallPrompt';
@@ -246,6 +247,9 @@ export default function App() {
               error={riverError}
               cityName={selectedCity.name}
             />
+
+            {/* Câmeras ao Vivo & Portais da Defesa Civil */}
+            <LiveCamerasWidget />
 
             {/* Dedicated 7-Day Forecast Widget */}
             <ForecastWidget forecast7Days={data.forecast7Days} />
