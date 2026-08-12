@@ -13,7 +13,14 @@ import { fetchPluviometryData } from './services/openMeteo';
 import { AlertCircle, CloudRain, Droplets, Loader2, MapPin, RefreshCw, Thermometer, Wind } from 'lucide-react';
 
 export default function App() {
-  const [selectedCity, setSelectedCity] = useState(DEFAULT_CITY);
+  const [selectedCity, setSelectedCity] = useState(() => {
+    const savedId = localStorage.getItem('pluviosc_favorite_city');
+    if (savedId) {
+      const found = SC_CITIES.find(c => c.id === savedId);
+      if (found) return found;
+    }
+    return DEFAULT_CITY; // Itajaí SC
+  });
   const [isGpsActive, setIsGpsActive] = useState(false);
   
   const [data, setData] = useState(null);
@@ -41,6 +48,9 @@ export default function App() {
   const handleSelectCity = (city) => {
     setIsGpsActive(false);
     setSelectedCity(city);
+    if (city.id && !city.id.startsWith('gps')) {
+      localStorage.setItem('pluviosc_favorite_city', city.id);
+    }
   };
 
   const handleUseGps = () => {

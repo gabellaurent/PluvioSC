@@ -19,4 +19,4 @@ export const SC_CITIES = [
   { id: 'canoinhas', name: 'Canoinhas', region: 'Planalto Norte', lat: -26.1772, lon: -50.3897 }
 ];
 
-export const DEFAULT_CITY = SC_CITIES[0]; // Florianópolis
+export const DEFAULT_CITY = SC_CITIES.find(c => c.id === 'itajai') || SC_CITIES[0]; // Itajaí SC
