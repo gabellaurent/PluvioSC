@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
+import MobileQuickSummary from './components/MobileQuickSummary';
 import AccumulatedCards from './components/AccumulatedCards';
 import RiskAlertBanner from './components/RiskAlertBanner';
+import ForecastWidget from './components/ForecastWidget';
 import PrecipitationCharts from './components/PrecipitationCharts';
 import DataTable from './components/DataTable';
 import Footer from './components/Footer';
 import { SC_CITIES, DEFAULT_CITY } from './data/scCities';
 import { fetchPluviometryData } from './services/openMeteo';
-import { AlertCircle, CloudRain, Droplets, Loader2, MapPin, RefreshCw, Thermometer, Wind, Eye } from 'lucide-react';
+import { AlertCircle, CloudRain, Droplets, Loader2, MapPin, RefreshCw, Thermometer, Wind } from 'lucide-react';
 
 export default function App() {
   const [selectedCity, setSelectedCity] = useState(DEFAULT_CITY);
@@ -86,7 +88,7 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6">
         
         {/* Weather Hero Card */}
-        <div className="glass-card-static p-6 lg:p-8 mb-6 relative overflow-hidden bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-cyan-950/40 border border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <div className="glass-card-static p-5 lg:p-8 mb-4 relative overflow-hidden bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-cyan-950/40 border border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           {/* Background Ambient Glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -94,78 +96,65 @@ export default function App() {
             
             {/* Left Location Info */}
             <div className="flex items-start gap-4">
-              <div className="p-4 rounded-2xl bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.2)] shrink-0">
-                <MapPin className="w-8 h-8 animate-float" />
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.2)] shrink-0">
+                <MapPin className="w-7 h-7 sm:w-8 sm:h-8 animate-float" />
               </div>
               <div>
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <h2 className="text-3xl lg:text-4xl font-black text-slate-100 tracking-tight">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-100 tracking-tight">
                     {selectedCity.name}
                   </h2>
                   {selectedCity.capital && (
-                    <span className="text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+                    <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
                       Capital SC ⭐
                     </span>
                   )}
                 </div>
-                <p className="text-sm font-medium text-slate-400 mt-1 flex flex-wrap items-center gap-2">
+                <p className="text-xs sm:text-sm font-medium text-slate-400 mt-1 flex flex-wrap items-center gap-2">
                   <span className="text-cyan-300 font-semibold">{selectedCity.region}</span>
-                  <span>•</span>
-                  <span>Coordenadas: {selectedCity.lat.toFixed(4)}°, {selectedCity.lon.toFixed(4)}°</span>
+                  <span className="hidden sm:inline">•</span>
+                  <span className="hidden sm:inline">Coordenadas: {selectedCity.lat.toFixed(4)}°, {selectedCity.lon.toFixed(4)}°</span>
                 </p>
               </div>
             </div>
 
             {/* Right Live Weather Stats Pill */}
             {data?.current && (
-              <div className="w-full lg:w-auto bg-slate-950/80 p-4 rounded-2xl border border-white/10 flex flex-wrap items-center justify-between lg:justify-end gap-6 shadow-inner">
+              <div className="w-full lg:w-auto bg-slate-950/80 p-3.5 sm:p-4 rounded-2xl border border-white/10 flex items-center justify-between sm:justify-end gap-3 sm:gap-6 shadow-inner">
                 {/* Temp */}
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2">
                   <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
                     <Thermometer className="w-4 h-4" />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block">Temperatura</span>
-                    <span className="font-black text-slate-100 text-base">{data.current.temp} °C</span>
+                    <span className="text-[9px] sm:text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block">Temp.</span>
+                    <span className="font-black text-slate-100 text-sm sm:text-base">{data.current.temp} °C</span>
                   </div>
                 </div>
 
-                <div className="h-8 w-px bg-slate-800 hidden sm:block"></div>
+                <div className="h-7 w-px bg-slate-800"></div>
 
                 {/* Humidity */}
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2">
                   <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
                     <Droplets className="w-4 h-4" />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block">Umidade</span>
-                    <span className="font-black text-slate-100 text-base">{data.current.humidity}%</span>
+                    <span className="text-[9px] sm:text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block">Umidade</span>
+                    <span className="font-black text-slate-100 text-sm sm:text-base">{data.current.humidity}%</span>
                   </div>
                 </div>
 
-                <div className="h-8 w-px bg-slate-800 hidden sm:block"></div>
-
-                {/* Wind */}
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                    <Wind className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block">Vento</span>
-                    <span className="font-black text-slate-100 text-base">{data.current.windSpeed} km/h</span>
-                  </div>
-                </div>
-
-                <div className="h-8 w-px bg-slate-800 hidden sm:block"></div>
+                <div className="h-7 w-px bg-slate-800"></div>
 
                 {/* Condition */}
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2">
                   <div className="p-2 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
                     <CloudRain className="w-4 h-4" />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block">Condição</span>
-                    <span className="font-extrabold text-cyan-300 text-xs">{data.current.weatherText}</span>
+                    <span className="text-[9px] sm:text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block">Condição</span>
+                    <span className="font-extrabold text-cyan-300 text-xs truncate max-w-[90px] sm:max-w-none">{data.current.weatherText}</span>
                   </div>
                 </div>
 
@@ -203,11 +192,17 @@ export default function App() {
         {/* Loaded Dashboard Content */}
         {data && (
           <>
+            {/* Mobile Quick Summary Card (Visivel no celular) */}
+            <MobileQuickSummary totals={data.totals} risk={data.risk} />
+
             {/* Defesa Civil SC Risk Banner */}
             <RiskAlertBanner risk={data.risk} last24hMm={data.totals.last24hMm} />
 
             {/* Accumulated Rainfall Cards (Hoje, 24h, 7 dias, Mês, Instantânea) */}
             <AccumulatedCards totals={data.totals} current={data.current} />
+
+            {/* Dedicated 7-Day Forecast Widget */}
+            <ForecastWidget forecast7Days={data.forecast7Days} />
 
             {/* Interactive Charts */}
             <PrecipitationCharts

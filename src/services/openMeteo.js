@@ -4,7 +4,7 @@
  */
 
 export async function fetchPluviometryData(lat, lon) {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,weather_code,wind_speed_10m&hourly=precipitation,rain,showers,weather_code,temperature_2m&daily=precipitation_sum,rain_sum,showers_sum,precipitation_hours,precipitation_probability_max&timezone=America%2FSao_Paulo&past_days=30&forecast_days=7`;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,weather_code,wind_speed_10m&hourly=precipitation,rain,showers,weather_code,temperature_2m&daily=precipitation_sum,rain_sum,showers_sum,precipitation_hours,precipitation_probability_max,temperature_2m_max,temperature_2m_min,weather_code&timezone=America%2FSao_Paulo&past_days=30&forecast_days=7`;
 
   const response = await fetch(url);
   if (!response.ok) {
@@ -113,6 +113,26 @@ function processPluviometry(data) {
     };
   });
 
+  // 9. Previsao dedicada dos proximos 7 dias
+  const forecast7Days = dailyTimes
+    .filter(t => t >= todayStr)
+    .slice(0, 7)
+    .map(timeStr => {
+      const idx = dailyTimes.indexOf(timeStr);
+      return {
+        date: timeStr,
+        displayDate: formatDateLabel(timeStr),
+        dayOfWeek: getDayOfWeekName(timeStr),
+        isToday: timeStr === todayStr,
+        precipMm: round(dailyPrecip[idx] || 0),
+        probPct: dailyProb[idx] || 0,
+        tempMax: round(daily.temperature_2m_max?.[idx]),
+        tempMin: round(daily.temperature_2m_min?.[idx]),
+        weatherCode: daily.weather_code?.[idx],
+        weatherText: getWeatherDescription(daily.weather_code?.[idx])
+      };
+    });
+
   return {
     raw: data,
     current: {
@@ -133,6 +153,7 @@ function processPluviometry(data) {
     risk: riskLevel,
     dailyChartData,
     hourlyChartData,
+    forecast7Days,
     lastUpdated: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
   };
 }
@@ -208,6 +229,15 @@ function formatTimeLabel(isoStr) {
   const timePart = isoStr.split('T')[1];
   if (!timePart) return isoStr;
   return `${timePart.substring(0, 5)}h`;
+}
+
+function getDayOfWeekName(dateStr) {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length < 3) return '';
+  const date = new Date(parts[0], parts[1] - 1, parts[2]);
+  const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  return days[date.getDay()];
 }
 
 function round(val) {
