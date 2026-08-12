@@ -4,12 +4,14 @@ import MobileQuickSummary from './components/MobileQuickSummary';
 import AccumulatedCards from './components/AccumulatedCards';
 import RiskAlertBanner from './components/RiskAlertBanner';
 import ForecastWidget from './components/ForecastWidget';
+import RiverLevelWidget from './components/RiverLevelWidget';
 import PrecipitationCharts from './components/PrecipitationCharts';
 import DataTable from './components/DataTable';
 import PwaInstallPrompt from './components/PwaInstallPrompt';
 import Footer from './components/Footer';
 import { SC_CITIES, DEFAULT_CITY } from './data/scCities';
 import { fetchPluviometryData } from './services/openMeteo';
+import { fetchRiverData } from './services/riverService';
 import { AlertCircle, CloudRain, Droplets, Loader2, MapPin, RefreshCw, Thermometer, Wind } from 'lucide-react';
 
 export default function App() {
@@ -27,17 +29,40 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [riverData, setRiverData] = useState(null);
+  const [riverLoading, setRiverLoading] = useState(true);
+  const [riverError, setRiverError] = useState(null);
+
   const loadData = useCallback(async (cityObj) => {
     try {
       setLoading(true);
+      setRiverLoading(true);
       setError(null);
-      const result = await fetchPluviometryData(cityObj.lat, cityObj.lon);
-      setData(result);
+      setRiverError(null);
+
+      const [pluvioResult, riverResult] = await Promise.allSettled([
+        fetchPluviometryData(cityObj.lat, cityObj.lon),
+        fetchRiverData(cityObj.lat, cityObj.lon, cityObj.id, cityObj.name)
+      ]);
+
+      if (pluvioResult.status === 'fulfilled') {
+        setData(pluvioResult.value);
+      } else {
+        setError(pluvioResult.reason?.message || 'Falha ao buscar dados meteorológicos.');
+      }
+
+      if (riverResult.status === 'fulfilled') {
+        setRiverData(riverResult.value);
+      } else {
+        console.error('Erro ao carregar dados dos rios:', riverResult.reason);
+        setRiverError('Informações da bacia hidrográfica indisponíveis no momento.');
+      }
     } catch (err) {
-      console.error('Erro ao carregar pluviometria:', err);
-      setError(err.message || 'Falha ao buscar dados meteorológicos da Open-Meteo.');
+      console.error('Erro ao carregar dados:', err);
+      setError(err.message || 'Erro inesperado.');
     } finally {
       setLoading(false);
+      setRiverLoading(false);
     }
   }, []);
 
@@ -60,6 +85,7 @@ export default function App() {
     }
 
     setLoading(true);
+    setRiverLoading(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const lat = position.coords.latitude;
@@ -78,6 +104,7 @@ export default function App() {
         console.error('Erro de geolocalização:', err);
         alert('Não foi possível obter sua localização GPS. Verifique as permissões.');
         setLoading(false);
+        setRiverLoading(false);
       }
     );
   };
@@ -180,7 +207,7 @@ export default function App() {
           <div className="glass-card p-16 my-8 flex flex-col items-center justify-center text-center">
             <Loader2 className="w-12 h-12 text-cyan-400 animate-spin mb-4" />
             <h3 className="text-xl font-black text-slate-200">Buscando dados da Open-Meteo...</h3>
-            <p className="text-xs text-slate-400 mt-1 font-medium">Calculando acumulados diários e estatísticas pluviométricas em {selectedCity.name}</p>
+            <p className="text-xs text-slate-400 mt-1 font-medium">Calculando acumulados diários, estatísticas e vazão dos rios em {selectedCity.name}</p>
           </div>
         )}
 
@@ -211,6 +238,14 @@ export default function App() {
 
             {/* Accumulated Rainfall Cards (Hoje, 24h, 7 dias, Mês, Instantânea) */}
             <AccumulatedCards totals={data.totals} current={data.current} />
+
+            {/* Monitoramento do Nível & Vazão dos Rios */}
+            <RiverLevelWidget
+              riverData={riverData}
+              loading={riverLoading}
+              error={riverError}
+              cityName={selectedCity.name}
+            />
 
             {/* Dedicated 7-Day Forecast Widget */}
             <ForecastWidget forecast7Days={data.forecast7Days} />
