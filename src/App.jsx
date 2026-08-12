@@ -6,6 +6,7 @@ import RiskAlertBanner from './components/RiskAlertBanner';
 import ForecastWidget from './components/ForecastWidget';
 import PrecipitationCharts from './components/PrecipitationCharts';
 import DataTable from './components/DataTable';
+import PwaInstallPrompt from './components/PwaInstallPrompt';
 import Footer from './components/Footer';
 import { SC_CITIES, DEFAULT_CITY } from './data/scCities';
 import { fetchPluviometryData } from './services/openMeteo';
@@ -219,6 +220,9 @@ export default function App() {
         )}
 
       </main>
+
+      {/* PWA Install Suggestion Banner */}
+      <PwaInstallPrompt />
 
       {/* Footer */}
       <Footer />
