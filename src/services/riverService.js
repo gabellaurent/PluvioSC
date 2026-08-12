@@ -37,7 +37,8 @@ function processRiverData(rawData, riverMeta) {
 
   const currentDischarge = round(discharge[todayIdx] ?? discharge[discharge.length - 1] ?? 0);
   const meanDischarge = round(dischargeMean[todayIdx] ?? riverMeta.normalDischargeMean ?? 10);
-  const maxForecastDischarge = Math.max(...discharge.slice(todayIdx));
+  const validDischarges = discharge.filter(v => typeof v === 'number' && !isNaN(v));
+  const maxForecastDischarge = validDischarges.length > 0 ? Math.max(...validDischarges.slice(todayIdx)) : currentDischarge;
 
   // Tendência comparando hoje com 2 dias atrás e com amanhã
   const prevDischarge = discharge[Math.max(0, todayIdx - 2)] ?? currentDischarge;

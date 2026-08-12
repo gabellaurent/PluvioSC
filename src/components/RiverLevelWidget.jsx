@@ -289,7 +289,7 @@ export default function RiverLevelWidget({ riverData, loading, error, cityName }
         <div className="flex items-center justify-between mb-3">
           <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
             <Waves className="w-3.5 h-3.5 text-cyan-400" />
-            Evolução e Previsão de Descarga Fluvial ($\text{m}^3/\text{s}$)
+            Evolução e Previsão de Descarga Fluvial (m³/s)
           </h4>
           <span className="text-[11px] text-slate-400 font-medium">
             Histórico (14 dias) + Previsão (7 dias)
