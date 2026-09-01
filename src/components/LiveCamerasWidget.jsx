@@ -14,8 +14,8 @@ export default function LiveCamerasWidget({ selectedCity }) {
       streamUrl: 'https://hls.asthon.com.br/elevado_jose_thome/index.m3u8',
       webUrl: 'https://hls.asthon.com.br/elevado_jose_thome/index.m3u8',
       type: 'hls',
-      badge: 'Direto HLS 🔴',
-      description: 'Fluxo de vídeo ao vivo HLS (.m3u8) no Elevado José Thomé em Rio do Sul.'
+      badge: 'Vídeo Direto HLS 🔴',
+      description: 'Transmissão em vídeo HD direto do leito urbano do rio em Rio do Sul.'
     },
     {
       id: 'blumenau',
@@ -25,8 +25,8 @@ export default function LiveCamerasWidget({ selectedCity }) {
       streamUrl: 'https://5a8d73edc0407.streamlock.net:443/bnutv20/bnutv2004.stream/playlist.m3u8',
       webUrl: 'https://bnu.tv/blumenau/clube-nautico-america-remo-blumenau/',
       type: 'hls',
-      badge: 'Direto HLS 🔴',
-      description: 'Fluxo de vídeo ao vivo HLS (.m3u8) do Rio Itajaí-Açu no Clube Náutico América em Blumenau.'
+      badge: 'Vídeo Direto HLS 🔴',
+      description: 'Transmissão em vídeo HD direto do Rio Itajaí-Açu no Clube Náutico América (Beira-Rio).'
     },
     {
       id: 'brusque',
@@ -35,9 +35,9 @@ export default function LiveCamerasWidget({ selectedCity }) {
       riverName: 'Rio Itajaí-Mirim',
       streamUrl: 'https://www.brusqueaovivo.com/cameras/sc/brusque/ponte-estaiada',
       webUrl: 'https://www.brusqueaovivo.com/cameras/sc/brusque/ponte-estaiada',
-      type: 'iframe',
+      type: 'direct_link',
       badge: 'Brusque ao Vivo 🔴',
-      description: 'Câmera em tempo real sobre o Rio Itajaí-Mirim na Ponte Estaiada em Brusque.'
+      description: 'Câmera em tempo real do Rio Itajaí-Mirim na Ponte Estaiada em Brusque.'
     }
   ];
 
@@ -130,7 +130,7 @@ export default function LiveCamerasWidget({ selectedCity }) {
             }`}
           >
             <Video className="w-3.5 h-3.5" />
-            Câmeras Diretas (3)
+            Câmeras dos Rios (3)
           </button>
           <button
             onClick={() => setActiveTab('portals')}
@@ -192,14 +192,28 @@ export default function LiveCamerasWidget({ selectedCity }) {
                   </p>
                 </video>
               ) : (
-                <iframe
-                  key={currentCamera.id}
-                  className="w-full h-full border-0"
-                  src={currentCamera.streamUrl}
-                  title={currentCamera.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
+                /* Card personalizado para Brusque com Player limpo e atalho direto */
+                <div className="flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-slate-900 to-slate-950 w-full h-full">
+                  <div className="p-4 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 mb-4 animate-bounce">
+                    <Video className="w-10 h-10" />
+                  </div>
+                  <h4 className="text-lg font-black text-slate-100 mb-1">
+                    Câmera da Ponte Estaiada em Brusque
+                  </h4>
+                  <p className="text-xs text-slate-400 max-w-md mb-6 leading-relaxed">
+                    O servidor de Brusque limita a exibição embutida por quadros externos. Clique no botão abaixo para abrir o player de vídeo limpo ao vivo em tempo real.
+                  </p>
+                  <a
+                    href={currentCamera.webUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-black bg-gradient-to-r from-red-500 to-amber-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] hover:scale-105 transition-all cursor-pointer"
+                  >
+                    <Play className="w-4 h-4 fill-current" />
+                    Abrir Câmera de Brusque ao Vivo 🔴
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </div>
               )}
             </div>
 
@@ -231,7 +245,7 @@ export default function LiveCamerasWidget({ selectedCity }) {
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-red-500 to-amber-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:opacity-95 transition-all shrink-0 cursor-pointer"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
-                Abrir Câmera Direta
+                Abrir Transmissão Direta
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
