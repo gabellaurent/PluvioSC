@@ -31,6 +31,7 @@ async function captureAllSnapshots() {
 
   const now = new Date();
   const dateStr = now.toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' }); // "YYYY-MM-DD"
+  const hourStr = String(now.getHours()).padStart(2, '0');
   const minutes = now.getMinutes();
   const minuteStr = minutes >= 30 ? '30' : '00';
   const timestampId = `${dateStr}_${hourStr}-${minuteStr}`;
