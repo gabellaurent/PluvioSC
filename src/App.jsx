@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
+import MobileDashboard from './components/MobileDashboard';
 import MobileQuickSummary from './components/MobileQuickSummary';
 import AccumulatedCards from './components/AccumulatedCards';
 import RiskAlertBanner from './components/RiskAlertBanner';
@@ -126,8 +127,8 @@ export default function App() {
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6">
         
-        {/* Weather Hero Card */}
-        <div className="glass-card-static p-5 lg:p-8 mb-4 relative overflow-hidden bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-cyan-950/40 border border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        {/* Weather Hero Card (WEB Only) */}
+        <div className="hidden md:block glass-card-static p-5 lg:p-8 mb-4 relative overflow-hidden bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-cyan-950/40 border border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           {/* Background Ambient Glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -231,40 +232,49 @@ export default function App() {
         {/* Loaded Dashboard Content */}
         {data && (
           <>
-            {/* Mobile Quick Summary Card (Visivel no celular) */}
-            <MobileQuickSummary totals={data.totals} risk={data.risk} />
+            {/* MOBILE LAYOUT (Apenas os 3 cards ultra simples) */}
+            <div className="block md:hidden">
+              <MobileDashboard
+                data={data}
+                selectedCity={selectedCity}
+                riverData={riverData}
+              />
+            </div>
 
-            {/* Defesa Civil SC Risk Banner */}
-            <RiskAlertBanner risk={data.risk} last24hMm={data.totals.last24hMm} />
+            {/* WEB DESKTOP LAYOUT (Layout completo) */}
+            <div className="hidden md:block space-y-6">
+              {/* Defesa Civil SC Risk Banner */}
+              <RiskAlertBanner risk={data.risk} last24hMm={data.totals.last24hMm} />
 
-            {/* Accumulated Rainfall Cards (Hoje, 24h, 7 dias, Mês, Instantânea) */}
-            <AccumulatedCards totals={data.totals} current={data.current} />
+              {/* Accumulated Rainfall Cards (Hoje, 24h, 7 dias, Mês, Instantânea) */}
+              <AccumulatedCards totals={data.totals} current={data.current} />
 
-            {/* Monitoramento do Nível & Vazão dos Rios */}
-            <RiverLevelWidget
-              riverData={riverData}
-              loading={riverLoading}
-              error={riverError}
-              cityName={selectedCity.name}
-            />
+              {/* Monitoramento do Nível & Vazão dos Rios */}
+              <RiverLevelWidget
+                riverData={riverData}
+                loading={riverLoading}
+                error={riverError}
+                cityName={selectedCity.name}
+              />
 
-            {/* Timelapse 24h & Linha do Tempo Visual dos Rios */}
-            <TimelapseWidget selectedCity={selectedCity} />
+              {/* Timelapse 24h & Linha do Tempo Visual dos Rios */}
+              <TimelapseWidget selectedCity={selectedCity} />
 
-            {/* Dedicated 7-Day Forecast Widget */}
-            <ForecastWidget forecast7Days={data.forecast7Days} />
+              {/* Dedicated 7-Day Forecast Widget */}
+              <ForecastWidget forecast7Days={data.forecast7Days} />
 
-            {/* Interactive Charts */}
-            <PrecipitationCharts
-              dailyData={data.dailyChartData}
-              hourlyData={data.hourlyChartData}
-            />
+              {/* Interactive Charts */}
+              <PrecipitationCharts
+                dailyData={data.dailyChartData}
+                hourlyData={data.hourlyChartData}
+              />
 
-            {/* Detailed Data Table + CSV Download */}
-            <DataTable
-              dailyData={data.dailyChartData}
-              cityName={selectedCity.name}
-            />
+              {/* Detailed Data Table + CSV Download */}
+              <DataTable
+                dailyData={data.dailyChartData}
+                cityName={selectedCity.name}
+              />
+            </div>
           </>
         )}
 
