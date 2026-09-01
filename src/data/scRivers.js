@@ -24,6 +24,16 @@ export const CITY_RIVER_MAPPING = {
     attentionGaugeHeight: 5.0,
     emergencyGaugeHeight: 8.0
   },
+  brusque: {
+    riverName: 'Rio Itajaí-Mirim',
+    basinName: 'Bacia do Rio Itajaí-Mirim',
+    description: 'Monitoramento fluviométrico do Rio Itajaí-Mirim em Brusque (Ponte Estaiada / Centro).',
+    mainThreat: 'Elevação rápida por precipitação intensa nas cabeceiras.',
+    normalDischargeMean: 45.0,
+    normalGaugeHeight: 1.4,
+    attentionGaugeHeight: 4.0,
+    emergencyGaugeHeight: 6.5
+  },
   joinville: {
     riverName: 'Rio Cachoeira & Cubatão Norte',
     basinName: 'Bacia do Rio Cubatão Norte',
