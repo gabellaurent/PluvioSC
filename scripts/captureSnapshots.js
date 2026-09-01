@@ -31,9 +31,10 @@ async function captureAllSnapshots() {
 
   const now = new Date();
   const dateStr = now.toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' }); // "YYYY-MM-DD"
-  const hourStr = String(now.getHours()).padStart(2, '0');
-  const minutes = now.getMinutes();
-  const minuteStr = minutes >= 30 ? '30' : '00';
+  const brtTimeStr = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', hour12: false });
+  const [hourStr, rawMinute] = brtTimeStr.split(':');
+  const minuteNum = parseInt(rawMinute, 10);
+  const minuteStr = minuteNum >= 30 ? '30' : '00';
   const timestampId = `${dateStr}_${hourStr}-${minuteStr}`;
   const timeLabel = `${hourStr}:${minuteStr}h (${formatDateShort(dateStr)})`;
   const isoTimestamp = now.toISOString();
