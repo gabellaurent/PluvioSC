@@ -249,7 +249,7 @@ export default function App() {
             />
 
             {/* Câmeras ao Vivo & Portais da Defesa Civil */}
-            <LiveCamerasWidget />
+            <LiveCamerasWidget selectedCity={selectedCity} />
 
             {/* Dedicated 7-Day Forecast Widget */}
             <ForecastWidget forecast7Days={data.forecast7Days} />

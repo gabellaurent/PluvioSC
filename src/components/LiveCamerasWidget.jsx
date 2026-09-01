@@ -1,8 +1,45 @@
-import React, { useState } from 'react';
-import { Camera, ExternalLink, ShieldAlert, Video, Waves, Radio, Eye, Layers } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Camera, ExternalLink, ShieldAlert, Video, Radio, Eye, Layers, MapPin, Play } from 'lucide-react';
 
-export default function LiveCamerasWidget() {
-  const [activeTab, setActiveTab] = useState('stream'); // 'stream' | 'portals'
+export default function LiveCamerasWidget({ selectedCity }) {
+  const [activeTab, setActiveTab] = useState('cameras'); // 'cameras' | 'portals'
+  const [selectedCameraId, setSelectedCameraId] = useState('riodosul');
+
+  const CAMERAS = [
+    {
+      id: 'riodosul',
+      cityName: 'Rio do Sul',
+      title: 'Rio do Sul - Elevado José Thomé',
+      riverName: 'Rio Itajaí-Açu / Itajaí do Sul',
+      streamUrl: 'https://hls.asthon.com.br/elevado_jose_thome/index.m3u8',
+      webUrl: 'https://hls.asthon.com.br/elevado_jose_thome/index.m3u8',
+      type: 'hls',
+      badge: 'Ao Vivo HLS 🔴',
+      description: 'Câmera HD ao vivo no Elevado José Thomé monitorando a calha urbana do rio em Rio do Sul.'
+    },
+    {
+      id: 'blumenau',
+      cityName: 'Blumenau',
+      title: 'Blumenau - Clube Náutico América',
+      riverName: 'Rio Itajaí-Açu (Remo / Beira-Rio)',
+      streamUrl: 'https://bnu.tv/blumenau/clube-nautico-america-remo-blumenau/',
+      webUrl: 'https://bnu.tv/blumenau/clube-nautico-america-remo-blumenau/',
+      type: 'iframe',
+      badge: 'BNU.tv 🔴',
+      description: 'Transmissão ao vivo do Rio Itajaí-Açu no Clube Náutico América em Blumenau.'
+    },
+    {
+      id: 'brusque',
+      cityName: 'Brusque',
+      title: 'Brusque - Ponte Estaiada',
+      riverName: 'Rio Itajaí-Mirim',
+      streamUrl: 'https://www.brusqueaovivo.com/cameras/sc/brusque/ponte-estaiada',
+      webUrl: 'https://www.brusqueaovivo.com/cameras/sc/brusque/ponte-estaiada',
+      type: 'iframe',
+      badge: 'Brusque ao Vivo 🔴',
+      description: 'Câmera em tempo real sobre o Rio Itajaí-Mirim na Ponte Estaiada em Brusque.'
+    }
+  ];
 
   const DEFESA_CIVIL_PORTALS = [
     {
@@ -43,6 +80,18 @@ export default function LiveCamerasWidget() {
     }
   ];
 
+  // Seleção automática baseada na cidade atual se houver correspondente
+  useEffect(() => {
+    if (selectedCity?.id) {
+      const match = CAMERAS.find(c => c.id === selectedCity.id || selectedCity.id.includes(c.id));
+      if (match) {
+        setSelectedCameraId(match.id);
+      }
+    }
+  }, [selectedCity]);
+
+  const currentCamera = CAMERAS.find(c => c.id === selectedCameraId) || CAMERAS[0];
+
   return (
     <section className="glass-card p-6 my-6 relative overflow-hidden bg-gradient-to-b from-slate-900/90 via-slate-900/80 to-slate-950/90 border border-cyan-500/20 shadow-[0_15px_40px_rgba(0,0,0,0.4)]">
       {/* Ambient background glow */}
@@ -57,7 +106,7 @@ export default function LiveCamerasWidget() {
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="text-xl font-black text-slate-100 tracking-tight">
-                Câmeras & Portais ao Vivo da Defesa Civil
+                Câmeras ao Vivo do Rio & Portais da Defesa Civil
               </h3>
               <span className="inline-flex items-center gap-1 text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.3)] animate-pulse">
                 <Radio className="w-3 h-3" />
@@ -65,7 +114,7 @@ export default function LiveCamerasWidget() {
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-1 font-medium">
-              Acompanhamento visual em tempo real do Rio Itajaí-Açu e acesso direto aos portais das barragens de SC
+              Transmissões em tempo real das réguas e pontes em Rio do Sul, Blumenau, Brusque e barragens de SC
             </p>
           </div>
         </div>
@@ -73,15 +122,15 @@ export default function LiveCamerasWidget() {
         {/* Tab Selector */}
         <div className="flex items-center gap-1 bg-slate-950/80 p-1.5 rounded-2xl border border-white/10 shadow-inner shrink-0">
           <button
-            onClick={() => setActiveTab('stream')}
+            onClick={() => setActiveTab('cameras')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              activeTab === 'stream'
+              activeTab === 'cameras'
                 ? 'bg-gradient-to-r from-red-500 to-amber-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.35)]'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
             }`}
           >
             <Video className="w-3.5 h-3.5" />
-            Câmera do Rio
+            Câmeras dos Rios (3)
           </button>
           <button
             onClick={() => setActiveTab('portals')}
@@ -99,46 +148,92 @@ export default function LiveCamerasWidget() {
 
       {/* Main Content Body */}
       <div className="mt-6 relative z-10">
-        {activeTab === 'stream' ? (
-          <div className="space-y-4">
-            {/* Live Streaming Video Container */}
-            <div className="relative w-full aspect-video bg-slate-950 rounded-2xl overflow-hidden border border-white/10 shadow-2xl group">
-              <iframe
-                className="w-full h-full border-0"
-                src="https://www.youtube.com/embed/videoseries?list=PL_XQ6Oa-d4B4e1qV8t2_y8t6N2W1K_3Xy"
-                title="Câmera ao vivo do Rio Itajaí-Açu em Blumenau / Vale do Itajaí"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
+        {activeTab === 'cameras' ? (
+          <div className="space-y-5">
+            
+            {/* Camera Selector Pills */}
+            <div className="flex flex-wrap items-center gap-2 pb-2">
+              {CAMERAS.map((cam) => {
+                const isSelected = cam.id === selectedCameraId;
+                return (
+                  <button
+                    key={cam.id}
+                    onClick={() => setSelectedCameraId(cam.id)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_15px_rgba(6,182,212,0.35)] scale-105'
+                        : 'bg-slate-950/80 text-slate-300 border border-white/10 hover:border-cyan-500/40 hover:bg-slate-900'
+                    }`}
+                  >
+                    <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>{cam.cityName}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-900/80 text-cyan-300 font-mono">
+                      {cam.badge}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Live Streaming Banner & YouTube Direct Link */}
-            <div className="p-4 rounded-2xl bg-slate-950/80 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-inner">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 shrink-0">
+            {/* Video Player Display Container */}
+            <div className="relative w-full aspect-video bg-slate-950 rounded-2xl overflow-hidden border border-white/10 shadow-2xl group flex flex-col justify-center items-center">
+              {currentCamera.type === 'hls' ? (
+                <video
+                  controls
+                  autoPlay
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                  src={currentCamera.streamUrl}
+                >
+                  <p className="text-xs text-slate-400 p-4 text-center">
+                    Seu navegador não possui suporte direto a fluxo HLS. Use o botão abaixo para abrir a transmissão ao vivo.
+                  </p>
+                </video>
+              ) : (
+                <iframe
+                  className="w-full h-full border-0"
+                  src={currentCamera.streamUrl}
+                  title={currentCamera.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              )}
+            </div>
+
+            {/* Camera Details Card & External Link Button */}
+            <div className="p-4 rounded-2xl bg-slate-950/80 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-inner">
+              <div className="flex items-start gap-3">
+                <div className="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shrink-0 mt-0.5">
                   <Eye className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-slate-200">
-                    Transmissão em Tempo Real do Rio Itajaí-Açu
-                  </h4>
-                  <p className="text-[11px] text-slate-400 font-medium">
-                    Monitoramento da calha do rio na Beira-Rio em Blumenau e região do Vale.
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm font-black text-slate-100">
+                      {currentCamera.title}
+                    </h4>
+                    <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                      {currentCamera.riverName}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 font-medium mt-1">
+                    {currentCamera.description}
                   </p>
                 </div>
               </div>
 
               <a
-                href="https://www.youtube.com/@BNUtvOficial/streams"
+                href={currentCamera.webUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black bg-red-500/20 text-red-300 border border-red-500/40 hover:bg-red-500/30 transition-all shrink-0 cursor-pointer shadow-md"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-red-500 to-amber-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:opacity-95 transition-all shrink-0 cursor-pointer"
               >
-                <Video className="w-3.5 h-3.5" />
-                Abrir no YouTube ao Vivo
-                <ExternalLink className="w-3 h-3" />
+                <Play className="w-3.5 h-3.5 fill-current" />
+                Abrir Câmera em Nova Aba
+                <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
+
           </div>
         ) : (
           /* Portals Grid */
