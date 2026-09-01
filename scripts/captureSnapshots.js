@@ -31,9 +31,10 @@ async function captureAllSnapshots() {
 
   const now = new Date();
   const dateStr = now.toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' }); // "YYYY-MM-DD"
-  const hourStr = String(now.getHours()).padStart(2, '0');
-  const timestampId = `${dateStr}_${hourStr}-00`;
-  const timeLabel = `${hourStr}:00h (${formatDateShort(dateStr)})`;
+  const minutes = now.getMinutes();
+  const minuteStr = minutes >= 30 ? '30' : '00';
+  const timestampId = `${dateStr}_${hourStr}-${minuteStr}`;
+  const timeLabel = `${hourStr}:${minuteStr}h (${formatDateShort(dateStr)})`;
   const isoTimestamp = now.toISOString();
 
   // Garante que a pasta public/snapshots existe
