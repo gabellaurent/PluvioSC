@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Camera, Clock, Play, Pause, SkipBack, SkipForward, RefreshCw, Layers, MapPin, Sparkles, AlertCircle } from 'lucide-react';
 
+const resolveSnapshotUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  const cleanBase = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/';
+  const cleanUrl = url.replace(/^\.\//, '');
+  return `${cleanBase}${cleanUrl}`;
+};
+
 export default function TimelapseWidget({ selectedCity }) {
   const [manifest, setManifest] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,12 +38,14 @@ export default function TimelapseWidget({ selectedCity }) {
   const loadManifest = async () => {
     try {
       setLoading(true);
-      const res = await fetch('./snapshots/manifest.json?v=' + Date.now());
+      const baseUrl = import.meta.env.BASE_URL || '/';
+      const manifestUrl = `${baseUrl.endsWith('/') ? baseUrl : baseUrl + '/'}snapshots/manifest.json?v=${Date.now()}`;
+      const res = await fetch(manifestUrl);
       if (res.ok) {
         const data = await res.json();
         setManifest(data);
       } else {
-        console.warn('Manifesto de snapshots ainda não encontrado, usando fallback local.');
+        console.warn('Manifesto de snapshots ainda não encontrado no caminho:', manifestUrl);
       }
     } catch (err) {
       console.error('Erro ao carregar manifesto de timelapse:', err);
@@ -149,11 +160,10 @@ export default function TimelapseWidget({ selectedCity }) {
         <div className="relative w-full aspect-video bg-slate-950 rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center group">
           {activeSnapshot ? (
             <img
-              src={activeSnapshot.url}
+              src={resolveSnapshotUrl(activeSnapshot.url)}
               alt={`Snapshot ${currentRiverConfig.name} - ${activeSnapshot.timeLabel}`}
               className="w-full h-full object-cover transition-opacity duration-300"
               onError={(e) => {
-                // Se a imagem não for encontrada, mostra o fallback gerado
                 e.target.onerror = null;
                 e.target.src = `https://via.placeholder.com/800x450/0f172a/38bdf8?text=Captura+de+${encodeURIComponent(currentRiverConfig.name)}+(${encodeURIComponent(activeSnapshot.timeLabel)})`;
               }}
