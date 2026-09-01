@@ -19,7 +19,7 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Instalar FFmpeg
         run: |
@@ -27,7 +27,7 @@ jobs:
           sudo apt-get install -y ffmpeg
 
       - name: Instalar Dependências do Projeto
-        run: npm ci || npm install
+        run: npm install
 
       - name: Executar Captura de Snapshots
         run: node scripts/captureSnapshots.js
@@ -39,7 +39,11 @@ jobs:
           git add public/snapshots/
           git diff --quiet && git diff --staged --quiet || (git commit -m "chore(cron): atualiza snapshots horários dos rios [skip ci]" && git push origin main)
 
-      - name: Deploy Atualizado no GitHub Pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run deploy
+      - name: Build da Aplicação
+        run: npm run build
+
+      - name: Deploy no GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
+          branch: gh-pages
