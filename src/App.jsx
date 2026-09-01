@@ -5,7 +5,6 @@ import AccumulatedCards from './components/AccumulatedCards';
 import RiskAlertBanner from './components/RiskAlertBanner';
 import ForecastWidget from './components/ForecastWidget';
 import RiverLevelWidget from './components/RiverLevelWidget';
-import LiveCamerasWidget from './components/LiveCamerasWidget';
 import TimelapseWidget from './components/TimelapseWidget';
 import PrecipitationCharts from './components/PrecipitationCharts';
 import DataTable from './components/DataTable';
@@ -248,9 +247,6 @@ export default function App() {
               error={riverError}
               cityName={selectedCity.name}
             />
-
-            {/* Câmeras ao Vivo & Portais da Defesa Civil */}
-            <LiveCamerasWidget selectedCity={selectedCity} />
 
             {/* Timelapse 24h & Linha do Tempo Visual dos Rios */}
             <TimelapseWidget selectedCity={selectedCity} />
