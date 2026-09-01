@@ -22,7 +22,7 @@ const RIVERS = [
   {
     id: 'brusque',
     name: 'Brusque - Ponte Estaiada',
-    streamUrl: 'https://www.brusqueaovivo.com/cameras/sc/brusque/ponte-estaiada'
+    streamUrl: 'https://video1.bjnet.com.br/nlSErT0wFBlpMB1ZIdQIOTr4bUHsYB/hls/admin/nUstEoUDyg/s.m3u8'
   }
 ];
 
