@@ -44,19 +44,8 @@ async function captureAllSnapshots() {
     fs.mkdirSync(snapshotsDir, { recursive: true });
   }
 
-  // Carrega ou inicializa o manifest.json
   const manifestPath = path.join(snapshotsDir, 'manifest.json');
   let manifest = { lastUpdated: isoTimestamp, rivers: {} };
-
-  if (fs.existsSync(manifestPath)) {
-    try {
-      manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    } catch (e) {
-      console.warn('Aviso: Falha ao ler manifest.json existente, criando novo.');
-    }
-  }
-
-  manifest.lastUpdated = isoTimestamp;
 
   for (const river of RIVERS) {
     const riverFolder = path.join(snapshotsDir, river.id);
@@ -66,35 +55,33 @@ async function captureAllSnapshots() {
 
     const filename = `${timestampId}.jpg`;
     const outputPath = path.join(riverFolder, filename);
-    const publicUrl = `./snapshots/${river.id}/${filename}`;
 
     console.log(`🎥 Capturando snapshot de ${river.name}...`);
-    const success = captureFrame(river.streamUrl, outputPath, river.name, timeLabel);
+    captureFrame(river.streamUrl, outputPath, river.name, timeLabel);
 
-    if (!manifest.rivers[river.id]) {
-      manifest.rivers[river.id] = [];
-    }
+    // Escaneia todas as fotos existentes na pasta do rio
+    const files = fs.readdirSync(riverFolder).filter(f => f.endsWith('.jpg'));
+    manifest.rivers[river.id] = files.map(file => {
+      const id = path.basename(file, '.jpg'); // ex: "2026-09-01_08-00"
+      const parts = id.split('_');
+      const datePart = parts[0] || dateStr;
+      const timePart = parts[1] ? parts[1].replace('-', ':') : '00:00';
+      const label = `${timePart}h (${formatDateShort(datePart)})`;
+      return {
+        id,
+        timestamp: isoTimestamp,
+        date: datePart,
+        timeLabel: label,
+        url: `./snapshots/${river.id}/${file}`,
+        success: true
+      };
+    });
 
-    // Adiciona o novo snapshot se ainda não existir
-    const existingIdx = manifest.rivers[river.id].findIndex(s => s.id === timestampId);
-    const snapshotItem = {
-      id: timestampId,
-      timestamp: isoTimestamp,
-      date: dateStr,
-      timeLabel: timeLabel,
-      url: publicUrl,
-      success
-    };
-
-    if (existingIdx !== -1) {
-      manifest.rivers[river.id][existingIdx] = snapshotItem;
-    } else {
-      manifest.rivers[river.id].push(snapshotItem);
-    }
-
-    // Ordena por horário e limita aos últimos 24 registros
+    // Ordena por id do horário
     manifest.rivers[river.id].sort((a, b) => a.id.localeCompare(b.id));
-    if (manifest.rivers[river.id].length > 24) {
+
+    // Mantém no máximo 48 fotos (24 horas de capturas a cada 30 min)
+    if (manifest.rivers[river.id].length > 48) {
       const removed = manifest.rivers[river.id].shift();
       if (removed && removed.url) {
         const fileToRemove = path.join(snapshotsDir, river.id, path.basename(removed.url));
@@ -106,15 +93,14 @@ async function captureAllSnapshots() {
     }
   }
 
-  // Salva o manifest.json atualizado
+  // Salva o manifest.json atualizado com todas as fotos presentes no disco
   fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
-  console.log('✅ Captura e atualização do manifest.json concluídas com sucesso!');
+  console.log('✅ Captura e sincronização total do manifest.json concluídas com sucesso!');
 }
 
 function captureFrame(streamUrl, outputPath, riverName, timeLabel) {
   try {
     if (streamUrl.endsWith('.m3u8')) {
-      // Tenta extrair 1 quadro usando ffmpeg se disponível
       const cmd = `ffmpeg -y -loglevel error -i "${streamUrl}" -vframes 1 -q:v 2 "${outputPath}"`;
       execSync(cmd, { timeout: 15000, stdio: 'pipe' });
       return true;
@@ -123,7 +109,6 @@ function captureFrame(streamUrl, outputPath, riverName, timeLabel) {
     console.warn(`Aviso: ffmpeg não disponível ou falhou para ${riverName}. Gerando snapshot visual alternativo.`);
   }
 
-  // Fallback: gera um SVG decorativo em JPG/SVG para testes e resiliência
   generateFallbackSVG(outputPath, riverName, timeLabel);
   return true;
 }
