@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pluviosc-v2';
+const CACHE_NAME = 'pluviosc-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -29,11 +29,13 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Network first strategy para HTML, APIs e novos bundles JS/CSS
+  // Network first strategy para HTML, APIs, snapshots e novos bundles JS/CSS
   if (
     event.request.mode === 'navigate' ||
     event.request.url.includes('api.open-meteo.com') ||
     event.request.url.includes('flood-api.open-meteo.com') ||
+    event.request.url.includes('snapshots') ||
+    event.request.url.includes('.json') ||
     event.request.url.includes('.js') ||
     event.request.url.includes('.css')
   ) {
