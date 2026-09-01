@@ -6,6 +6,7 @@ import RiskAlertBanner from './components/RiskAlertBanner';
 import ForecastWidget from './components/ForecastWidget';
 import RiverLevelWidget from './components/RiverLevelWidget';
 import LiveCamerasWidget from './components/LiveCamerasWidget';
+import TimelapseWidget from './components/TimelapseWidget';
 import PrecipitationCharts from './components/PrecipitationCharts';
 import DataTable from './components/DataTable';
 import PwaInstallPrompt from './components/PwaInstallPrompt';
@@ -250,6 +251,9 @@ export default function App() {
 
             {/* Câmeras ao Vivo & Portais da Defesa Civil */}
             <LiveCamerasWidget selectedCity={selectedCity} />
+
+            {/* Timelapse 24h & Linha do Tempo Visual dos Rios */}
+            <TimelapseWidget selectedCity={selectedCity} />
 
             {/* Dedicated 7-Day Forecast Widget */}
             <ForecastWidget forecast7Days={data.forecast7Days} />
