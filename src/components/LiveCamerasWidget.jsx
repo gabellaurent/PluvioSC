@@ -14,19 +14,19 @@ export default function LiveCamerasWidget({ selectedCity }) {
       streamUrl: 'https://hls.asthon.com.br/elevado_jose_thome/index.m3u8',
       webUrl: 'https://hls.asthon.com.br/elevado_jose_thome/index.m3u8',
       type: 'hls',
-      badge: 'Ao Vivo HLS 🔴',
-      description: 'Câmera HD ao vivo no Elevado José Thomé monitorando a calha urbana do rio em Rio do Sul.'
+      badge: 'Direto HLS 🔴',
+      description: 'Fluxo de vídeo ao vivo HLS (.m3u8) no Elevado José Thomé em Rio do Sul.'
     },
     {
       id: 'blumenau',
       cityName: 'Blumenau',
       title: 'Blumenau - Clube Náutico América',
       riverName: 'Rio Itajaí-Açu (Remo / Beira-Rio)',
-      streamUrl: 'https://bnu.tv/blumenau/clube-nautico-america-remo-blumenau/',
+      streamUrl: 'https://5a8d73edc0407.streamlock.net:443/bnutv20/bnutv2004.stream/playlist.m3u8',
       webUrl: 'https://bnu.tv/blumenau/clube-nautico-america-remo-blumenau/',
-      type: 'iframe',
-      badge: 'BNU.tv 🔴',
-      description: 'Transmissão ao vivo do Rio Itajaí-Açu no Clube Náutico América em Blumenau.'
+      type: 'hls',
+      badge: 'Direto HLS 🔴',
+      description: 'Fluxo de vídeo ao vivo HLS (.m3u8) do Rio Itajaí-Açu no Clube Náutico América em Blumenau.'
     },
     {
       id: 'brusque',
@@ -114,7 +114,7 @@ export default function LiveCamerasWidget({ selectedCity }) {
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-1 font-medium">
-              Transmissões em tempo real das réguas e pontes em Rio do Sul, Blumenau, Brusque e barragens de SC
+              Transmissões diretas dos rios em Rio do Sul, Blumenau, Brusque e barragens de SC
             </p>
           </div>
         </div>
@@ -130,7 +130,7 @@ export default function LiveCamerasWidget({ selectedCity }) {
             }`}
           >
             <Video className="w-3.5 h-3.5" />
-            Câmeras dos Rios (3)
+            Câmeras Diretas (3)
           </button>
           <button
             onClick={() => setActiveTab('portals')}
@@ -176,22 +176,24 @@ export default function LiveCamerasWidget({ selectedCity }) {
             </div>
 
             {/* Video Player Display Container */}
-            <div className="relative w-full aspect-video bg-slate-950 rounded-2xl overflow-hidden border border-white/10 shadow-2xl group flex flex-col justify-center items-center">
+            <div className="relative w-full aspect-video bg-slate-950 rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col justify-center items-center">
               {currentCamera.type === 'hls' ? (
                 <video
                   controls
                   autoPlay
                   muted
                   playsInline
+                  key={currentCamera.id}
                   className="w-full h-full object-cover"
                   src={currentCamera.streamUrl}
                 >
                   <p className="text-xs text-slate-400 p-4 text-center">
-                    Seu navegador não possui suporte direto a fluxo HLS. Use o botão abaixo para abrir a transmissão ao vivo.
+                    Seu navegador não suporta a reprodução direta do vídeo HLS. Use o botão abaixo para abrir a transmissão.
                   </p>
                 </video>
               ) : (
                 <iframe
+                  key={currentCamera.id}
                   className="w-full h-full border-0"
                   src={currentCamera.streamUrl}
                   title={currentCamera.title}
@@ -201,7 +203,7 @@ export default function LiveCamerasWidget({ selectedCity }) {
               )}
             </div>
 
-            {/* Camera Details Card & External Link Button */}
+            {/* Camera Details Card & Direct Link Button */}
             <div className="p-4 rounded-2xl bg-slate-950/80 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-inner">
               <div className="flex items-start gap-3">
                 <div className="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shrink-0 mt-0.5">
@@ -229,7 +231,7 @@ export default function LiveCamerasWidget({ selectedCity }) {
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-red-500 to-amber-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:opacity-95 transition-all shrink-0 cursor-pointer"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
-                Abrir Câmera em Nova Aba
+                Abrir Câmera Direta
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
