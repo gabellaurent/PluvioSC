@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-09-01T13:15:54.045Z",
+  "lastUpdated": "2026-09-01T13:19:08.005Z",
   "rivers": {
     "riodosul": [
       {
@@ -16,6 +16,14 @@
         "date": "2026-09-01",
         "timeLabel": "11:00h (01/09)",
         "url": "./snapshots/riodosul/2026-09-01_11-00.jpg",
+        "success": true
+      },
+      {
+        "id": "2026-09-01_13-00",
+        "timestamp": "2026-09-01T13:19:08.005Z",
+        "date": "2026-09-01",
+        "timeLabel": "13:00h (01/09)",
+        "url": "./snapshots/riodosul/2026-09-01_13-00.jpg",
         "success": true
       }
     ],
@@ -35,6 +43,14 @@
         "timeLabel": "11:00h (01/09)",
         "url": "./snapshots/blumenau/2026-09-01_11-00.jpg",
         "success": true
+      },
+      {
+        "id": "2026-09-01_13-00",
+        "timestamp": "2026-09-01T13:19:08.005Z",
+        "date": "2026-09-01",
+        "timeLabel": "13:00h (01/09)",
+        "url": "./snapshots/blumenau/2026-09-01_13-00.jpg",
+        "success": true
       }
     ],
     "brusque": [
@@ -52,6 +68,14 @@
         "date": "2026-09-01",
         "timeLabel": "11:00h (01/09)",
         "url": "./snapshots/brusque/2026-09-01_11-00.jpg",
+        "success": true
+      },
+      {
+        "id": "2026-09-01_13-00",
+        "timestamp": "2026-09-01T13:19:08.005Z",
+        "date": "2026-09-01",
+        "timeLabel": "13:00h (01/09)",
+        "url": "./snapshots/brusque/2026-09-01_13-00.jpg",
         "success": true
       }
     ]
