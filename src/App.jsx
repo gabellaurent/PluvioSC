@@ -3,9 +3,7 @@ import Header from './components/Header';
 import MobileDashboard from './components/MobileDashboard';
 import MobileQuickSummary from './components/MobileQuickSummary';
 import AccumulatedCards from './components/AccumulatedCards';
-import RiskAlertBanner from './components/RiskAlertBanner';
 import ForecastWidget from './components/ForecastWidget';
-import RiverLevelWidget from './components/RiverLevelWidget';
 import TimelapseWidget from './components/TimelapseWidget';
 import PrecipitationCharts from './components/PrecipitationCharts';
 import DataTable from './components/DataTable';
@@ -243,19 +241,8 @@ export default function App() {
 
             {/* WEB DESKTOP LAYOUT (Layout completo) */}
             <div className="hidden md:block space-y-6">
-              {/* Defesa Civil SC Risk Banner */}
-              <RiskAlertBanner risk={data.risk} last24hMm={data.totals.last24hMm} />
-
               {/* Accumulated Rainfall Cards (Hoje, 24h, 7 dias, Mês, Instantânea) */}
               <AccumulatedCards totals={data.totals} current={data.current} />
-
-              {/* Monitoramento do Nível & Vazão dos Rios */}
-              <RiverLevelWidget
-                riverData={riverData}
-                loading={riverLoading}
-                error={riverError}
-                cityName={selectedCity.name}
-              />
 
               {/* Timelapse 24h & Linha do Tempo Visual dos Rios */}
               <TimelapseWidget selectedCity={selectedCity} />
